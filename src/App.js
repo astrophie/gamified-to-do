@@ -1,24 +1,73 @@
-import logo from './logo.svg';
+import React, {useState, useEffect} from "react";
 import './App.css';
+import "bootstrap/dist/css/bootstrap.min.css"
+import { Container } from "react-bootstrap";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-function App() {
+// import components & contexts
+import NavComponent from "./components/Navbar";
+import TodoComp from "./components/TodoComponent";
+import Store from "./components/Store";
+import CartProvider from "./CartContext";
+
+function App() {  
+  const [coins, setCoins] = useState(0);
+
+  // save to local
+  const saveLocal = () => {
+    if (coins !== 0) {
+      localStorage.setItem("coins", JSON.stringify(coins));
+    }
+
+    else if (coins === 0) {
+      localStorage.setItem("coins", JSON.stringify(0));
+    }
+  } 
+
+  const getLocal = () => {
+    if(localStorage.getItem("coins") == null) {
+        localStorage.setItem("coins", JSON.stringify(0));
+      } else {
+        let localCoins = JSON.parse(localStorage.getItem("coins"));
+        setCoins(localCoins);
+      }
+
+    localStorage.setItem("items", JSON.stringify(coins));
+
+  }
+
+    // run once at beginning
+    useEffect(() => {
+      getLocal();
+    }, [])
+  
+     
+    useEffect(() => {
+      saveLocal();
+    }, [coins])
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <CartProvider>
+    <div className="App" >
+      <Container>
+      {/* routing to different pages*/}
+      <BrowserRouter>
+      <NavComponent/>
+        <Routes>
+          <Route path="/" element={<TodoComp
+            coins={coins}
+            setCoins={setCoins} />}/>
+
+          <Route path="store" element={<Store 
+            coins={coins}
+            setCoins={setCoins} />}/>
+
+        </Routes>
+      </BrowserRouter>
+      </Container>
     </div>
+    </CartProvider>
   );
 }
 
